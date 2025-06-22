@@ -31,8 +31,7 @@ jobs:
           make install_dependencies
       - name: Fetch APT repository
         run: |
-          CHROMIUM_DEB_SITE="http://deb.debian.org/debian"
-          sudo sh -c 'echo "deb ${CHROMIUM_DEB_SITE}/ sid main" >> /etc/apt/sources.list'
+          sudo sh -c 'echo "deb http://deb.debian.org/debian sid main" >> /etc/apt/sources.list'
           wget -qO- https://ftp-master.debian.org/keys/archive-key-12.asc | sudo gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg > /dev/null
           wget -qO- https://ftp-master.debian.org/keys/archive-key-12-security.asc | sudo gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/debian-archive-security-keyring.gpg > /dev/null
           sudo apt-get update -qqy
