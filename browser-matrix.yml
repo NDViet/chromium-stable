@@ -1,2 +1,5 @@
 matrix:
   browser:
+    '137':
+      CHROMIUM_VERSION: ''
+      CHROMIUM_PACKAGE_VERSION: ''
