@@ -8,11 +8,11 @@ def update_output_yaml(version):
         data = yaml.safe_load(file)
 
     if major_version in data['matrix']['browser']:
-        data['matrix']['browser'][major_version]['CHROME_VERSION'] = f'google-chrome-stable={version}'
+        data['matrix']['browser'][major_version]['CHROME_VERSION'] = f'chromium={version}'
         data['matrix']['browser'][major_version]['CHROME_PACKAGE_VERSION'] = version
     else:
         data['matrix']['browser'][major_version] = {
-            'CHROME_VERSION': f'google-chrome-stable={version}',
+            'CHROME_VERSION': f'chromium={version}',
             'CHROME_PACKAGE_VERSION': version
         }
 

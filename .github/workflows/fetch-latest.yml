@@ -14,7 +14,12 @@ permissions: write-all
 
 jobs:
   fetch-latest:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@main
@@ -26,10 +31,12 @@ jobs:
           make install_dependencies
       - name: Fetch APT repository
         run: |
-          curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg >> /dev/null
-          echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | sudo tee /etc/apt/sources.list.d/google-chrome.list
-          sudo apt-get update
-          LATEST_VERSION="$(apt-cache policy google-chrome-stable | grep Candidate | awk '{print $2}')"
+          CHROMIUM_DEB_SITE="http://deb.debian.org/debian"
+          echo "deb ${CHROMIUM_DEB_SITE}/ sid main" >> /etc/apt/sources.list
+          wget -qO- https://ftp-master.debian.org/keys/archive-key-12.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-keyring.gpg
+          wget -qO- https://ftp-master.debian.org/keys/archive-key-12-security.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/debian-archive-security-keyring.gpg
+          sudo apt-get update -qqy
+          LATEST_VERSION="$(apt-cache policy chromium | grep Candidate | awk '{print $2}')"
           echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
       - name: Update matrix file
         run: |
@@ -53,23 +60,15 @@ jobs:
         if: steps.check_release.outputs.release-exists == 'false' || 
             github.event.inputs.update-existing-release == 'true'
         run: |
-          apt download google-chrome-stable
-          ls -l google-chrome-stable_*.deb
-      - name: Get metadata from DEB package
-        id: get_metadata
-        run: |
-          DEB_FILE=$(ls google-chrome-stable_*.deb)
-          dpkg-deb -I $DEB_FILE > metadata.txt
-          dpkg-deb -c $DEB_FILE > contents.txt
+          apt download chromium-common chromium chromium-l10n chromium-driver
+          ls -l *.deb
       - name: Archive build as GH release
         if: steps.check_release.outputs.release-exists == 'false' ||
           github.event.inputs.update-existing-release == 'true'
         uses: softprops/action-gh-release@master
         with:
           files: |
-            google-chrome-stable_*.deb
-            metadata.txt
-            contents.txt
+            *.deb
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.LATEST_VERSION }}
           name: ${{ env.LATEST_VERSION }}
