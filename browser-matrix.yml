@@ -1,5 +1,2 @@
 matrix:
   browser:
-    '137':
-      CHROME_VERSION: chromium=137.0.7151.119-1
-      CHROME_PACKAGE_VERSION: 137.0.7151.119-1

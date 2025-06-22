@@ -8,12 +8,12 @@ def update_output_yaml(version):
         data = yaml.safe_load(file)
 
     if major_version in data['matrix']['browser']:
-        data['matrix']['browser'][major_version]['CHROME_VERSION'] = f'chromium={version}'
-        data['matrix']['browser'][major_version]['CHROME_PACKAGE_VERSION'] = version
+        data['matrix']['browser'][major_version]['CHROMIUM_VERSION'] = f'chromium={version}'
+        data['matrix']['browser'][major_version]['CHROMIUM_PACKAGE_VERSION'] = version
     else:
         data['matrix']['browser'][major_version] = {
-            'CHROME_VERSION': f'chromium={version}',
-            'CHROME_PACKAGE_VERSION': version
+            'CHROMIUM_VERSION': f'chromium={version}',
+            'CHROMIUM_PACKAGE_VERSION': version
         }
 
     # Sort the dictionary by major_version as a number
